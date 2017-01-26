@@ -21,8 +21,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class ScraperImpl implements Scraper {
 
     public static final String HTML_GENERAL_SELECTOR = "html";
-    public static final Integer SLEEP_TIME_MILIS = 2000;
-    private Thread pullingScrapeRequestThread;
 
     private ConcurrentLinkedQueue<ScrapeRequest> requestsQueue;
     private AtomicBoolean scrapperEnable;
@@ -46,36 +44,5 @@ public class ScraperImpl implements Scraper {
             long stopTime = System.currentTimeMillis();
             System.out.println("Elapsed time for product " + request.getProduct().getName() + " was " + TimeUnit.MILLISECONDS.toSeconds(stopTime - startTime) + " seconds.");
         }
-    }
-
-    //Async methods for worker queue
-    public void startScraperAsync() throws Exception {
-        scrapperEnable.getAndSet(true);
-        pullingScrapeRequestThread = new Thread(()-> {
-            while (scrapperEnable.getAndSet(true)) {
-                try {
-                    if(requestsQueue.size() > 0){
-                        System.out.println("Polling request. The current status of the queue is " + requestsQueue.size());
-                        scrape(requestsQueue.poll());
-                    }else {
-                        Thread.sleep(SLEEP_TIME_MILIS);
-                        System.out.println("No scrape requests in queue - Going to sleep for " + SLEEP_TIME_MILIS);
-                    }
-                } catch (Exception e) {
-                    System.out.println(e.toString());
-                }
-            }
-        });
-        pullingScrapeRequestThread.start();
-    }
-
-    public void stopScraperAsync() throws Exception {
-        scrapperEnable.getAndSet(false);
-        pullingScrapeRequestThread.interrupt();
-        System.out.println("Stopping the polling requests, we have  " + requestsQueue.size() + " scrape requests in the queue");
-    }
-
-    public void addScrapeRequestAsync(ScrapeRequest request) throws Exception {
-        requestsQueue.add(request);
     }
 }
