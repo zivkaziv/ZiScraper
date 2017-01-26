@@ -14,9 +14,20 @@ public class ScrapperRunner {
         try {
             Scraper scraper = new ScraperImpl();
             scrape(scraper,args);
+//            scrapeAsync(scraper, url);
 
         }catch (Exception e){
 
+        }
+    }
+
+    private static void scrapeAsync(Scraper scraper, String[] urls) throws Exception {
+        scraper.startScraperAsync();
+        for(String url : urls) {
+            ScrapeRequestFactoryImpl requestFactory = new ScrapeRequestFactoryImpl();
+            ScrapeRequest request = requestFactory.createRequest(url);
+            scraper.addScrapeRequestAsync(request);
+            request.getProduct().print();
         }
     }
 

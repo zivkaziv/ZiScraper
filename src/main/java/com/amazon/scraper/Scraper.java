@@ -12,4 +12,7 @@ import java.io.IOException;
  */
 public interface Scraper {
     void scrape(ScrapeRequest request) throws IOException;
+    void startScraperAsync() throws Exception;
+    void stopScraperAsync() throws Exception;
+    void addScrapeRequestAsync(ScrapeRequest request) throws Exception;
 }
